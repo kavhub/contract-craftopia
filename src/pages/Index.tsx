@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { FileText, Upload, Clock, AlertCircle, CheckCircle2 } from "lucide-react";
+import { FileText, Upload, Eye } from "lucide-react";
 
 export default function Index() {
   const userName = "John"; // This would come from your auth system
@@ -10,19 +10,19 @@ export default function Index() {
     {
       id: 1,
       name: "Service Agreement - Tech Solutions Inc",
-      status: "Active",
+      status: "Processing",
       date: "2024-02-20",
     },
     {
       id: 2,
       name: "NDA - Project Phoenix",
-      status: "Pending",
+      status: "Uploaded",
       date: "2024-02-19",
     },
     {
       id: 3,
       name: "Employment Contract - Jane Smith",
-      status: "Draft",
+      status: "Processing",
       date: "2024-02-18",
     },
   ];
@@ -78,36 +78,36 @@ export default function Index() {
         <div className="grid gap-4 md:grid-cols-3">
           <Card className="p-6">
             <div className="flex items-center space-x-4">
+              <div className="p-3 bg-blue-100 rounded-full">
+                <Upload className="h-6 w-6 text-blue-600" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Processing</p>
+                <h3 className="text-2xl font-bold">2</h3>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="p-6">
+            <div className="flex items-center space-x-4">
               <div className="p-3 bg-green-100 rounded-full">
-                <CheckCircle2 className="h-6 w-6 text-green-600" />
+                <FileText className="h-6 w-6 text-green-600" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Active Contracts</p>
-                <h3 className="text-2xl font-bold">12</h3>
+                <p className="text-sm text-muted-foreground">Total Contracts</p>
+                <h3 className="text-2xl font-bold">15</h3>
               </div>
             </div>
           </Card>
 
           <Card className="p-6">
             <div className="flex items-center space-x-4">
-              <div className="p-3 bg-yellow-100 rounded-full">
-                <Clock className="h-6 w-6 text-yellow-600" />
+              <div className="p-3 bg-purple-100 rounded-full">
+                <FileText className="h-6 w-6 text-purple-600" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Pending Review</p>
-                <h3 className="text-2xl font-bold">5</h3>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="p-6">
-            <div className="flex items-center space-x-4">
-              <div className="p-3 bg-red-100 rounded-full">
-                <AlertCircle className="h-6 w-6 text-red-600" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Expiring Soon</p>
-                <h3 className="text-2xl font-bold">3</h3>
+                <p className="text-sm text-muted-foreground">Added This Month</p>
+                <h3 className="text-2xl font-bold">8</h3>
               </div>
             </div>
           </Card>
@@ -128,17 +128,20 @@ export default function Index() {
                       </p>
                     </div>
                   </div>
-                  <span
-                    className={`px-3 py-1 rounded-full text-sm ${
-                      contract.status === "Active"
-                        ? "bg-green-100 text-green-700"
-                        : contract.status === "Pending"
-                        ? "bg-yellow-100 text-yellow-700"
-                        : "bg-gray-100 text-gray-700"
-                    }`}
-                  >
-                    {contract.status}
-                  </span>
+                  <div className="flex items-center gap-4">
+                    <span className={`px-3 py-1 rounded-full text-sm ${
+                      contract.status === "Processing"
+                        ? "bg-blue-100 text-blue-700"
+                        : "bg-green-100 text-green-700"
+                    }`}>
+                      {contract.status}
+                    </span>
+                    {contract.status === "Uploaded" && (
+                      <Link to={`/contracts/${contract.id}`}>
+                        <Eye className="h-5 w-5 text-muted-foreground hover:text-foreground transition-colors" />
+                      </Link>
+                    )}
+                  </div>
                 </div>
               </Card>
             ))}
