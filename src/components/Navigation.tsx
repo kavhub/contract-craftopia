@@ -7,33 +7,33 @@ export function Navigation() {
     <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex h-16 items-center px-4">
         <Link to="/" className="flex items-center space-x-2">
-          <FileText className="h-6 w-6" />
-          <span className="font-bold">ContractManager</span>
+          <FileText className="h-6 w-6 text-muted-foreground" />
+          <span className="font-bold">Contract Analysis</span>
         </Link>
         
         <div className="ml-auto flex items-center space-x-4">
           <Link to="/" className="flex items-center space-x-1 text-sm font-medium transition-colors hover:text-primary">
-            <Home className="h-4 w-4" />
+            <Home className="h-4 w-4 text-muted-foreground" />
             <span>Dashboard</span>
           </Link>
           <Link to="/contracts" className="flex items-center space-x-1 text-sm font-medium transition-colors hover:text-primary">
-            <FileText className="h-4 w-4" />
+            <FileText className="h-4 w-4 text-muted-foreground" />
             <span>Contracts</span>
           </Link>
           <Link to="/upload" className="flex items-center space-x-1 text-sm font-medium transition-colors hover:text-primary">
-            <Upload className="h-4 w-4" />
+            <Upload className="h-4 w-4 text-muted-foreground" />
             <span>Upload</span>
           </Link>
           <Link to="/help" className="flex items-center space-x-1 text-sm font-medium transition-colors hover:text-primary">
-            <HelpCircle className="h-4 w-4" />
+            <HelpCircle className="h-4 w-4 text-muted-foreground" />
             <span>Help</span>
           </Link>
           <Link to="/settings" className="flex items-center space-x-1 text-sm font-medium transition-colors hover:text-primary">
-            <Settings className="h-4 w-4" />
+            <Settings className="h-4 w-4 text-muted-foreground" />
             <span>Settings</span>
           </Link>
           <Button variant="ghost" size="icon">
-            <LogOut className="h-4 w-4" />
+            <LogOut className="h-4 w-4 text-muted-foreground" />
           </Button>
         </div>
       </div>
