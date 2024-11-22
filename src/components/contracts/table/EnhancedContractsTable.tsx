@@ -20,7 +20,7 @@ import { type ColumnDefinition } from "./CustomizeColumnsButton";
 import { ContractTableRow } from "./ContractTableRow";
 import type { Contract } from "./types";
 import * as XLSX from 'xlsx';
-import { TableHeader } from "./TableHeader";
+import { ContractsTableHeader } from "./TableHeader";
 import { useToast } from "@/hooks/use-toast";
 
 interface EnhancedContractsTableProps {
@@ -151,7 +151,7 @@ export function EnhancedContractsTable({
       <ScrollArea className="w-full overflow-auto" type="always">
         <div className="min-w-[1000px]">
           <Table>
-            <TableHeader 
+            <ContractsTableHeader 
               visibleColumns={visibleColumns} 
               onSort={handleSort} 
               sortConfig={sortConfig}

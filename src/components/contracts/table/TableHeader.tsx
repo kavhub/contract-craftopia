@@ -3,13 +3,13 @@ import { TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ArrowUpDown } from "lucide-react";
 import { type ColumnDefinition } from "./CustomizeColumnsButton";
 
-interface TableHeaderProps {
+interface ContractsTableHeaderProps {
   visibleColumns: ColumnDefinition[];
   onSort: (key: string) => void;
   sortConfig: { key: string; direction: 'asc' | 'desc' } | null;
 }
 
-export function TableHeader({ visibleColumns, onSort, sortConfig }: TableHeaderProps) {
+export function ContractsTableHeader({ visibleColumns, onSort, sortConfig }: ContractsTableHeaderProps) {
   return (
     <TableHeader>
       <TableRow>
