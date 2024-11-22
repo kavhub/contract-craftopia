@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { format } from "date-fns";  // Add this import
+import { format } from "date-fns";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,13 +11,25 @@ import {
 } from "@/components/ui/breadcrumb";
 import { SearchBar } from "@/components/contracts/search/SearchBar";
 import { AdvancedSearch } from "@/components/contracts/search/AdvancedSearch";
-import { ContractsTable } from "@/components/contracts/ContractsTable";
+import { EnhancedContractsTable } from "@/components/contracts/table/EnhancedContractsTable";
+import { CustomizeColumnsButton, type ColumnDefinition } from "@/components/contracts/table/CustomizeColumnsButton";
 
 export default function Contracts() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedType, setSelectedType] = useState("all");
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [selectedDate, setSelectedDate] = useState<Date>();
+  
+  const [columns, setColumns] = useState<ColumnDefinition[]>([
+    { id: "name", label: "Contract Name", visible: true },
+    { id: "type", label: "Type", visible: true },
+    { id: "dateUploaded", label: "Date Uploaded", visible: true },
+    { id: "status", label: "Status", visible: true },
+    { id: "currency", label: "Currency", visible: true },
+    { id: "value", label: "Value", visible: true },
+    { id: "parties", label: "Parties", visible: true },
+    { id: "restrictions", label: "Restrictions", visible: false },
+  ]);
 
   const contracts = [
     {
@@ -26,6 +38,10 @@ export default function Contracts() {
       type: "Service Agreement",
       dateUploaded: "2024-02-20",
       status: "Active",
+      currency: "USD",
+      value: 50000,
+      parties: ["Tech Solutions Inc", "Our Company"],
+      restrictions: "Non-transferable without consent",
     },
     {
       id: 2,
@@ -33,6 +49,8 @@ export default function Contracts() {
       type: "NDA",
       dateUploaded: "2024-02-19",
       status: "Pending",
+      parties: ["Phoenix Corp", "Our Company"],
+      restrictions: "Strictly confidential",
     },
     {
       id: 3,
@@ -40,6 +58,9 @@ export default function Contracts() {
       type: "Employment",
       dateUploaded: "2024-02-18",
       status: "Draft",
+      currency: "EUR",
+      value: 75000,
+      parties: ["Jane Smith", "Our Company"],
     },
   ];
 
@@ -87,9 +108,16 @@ export default function Contracts() {
               selectedDate={selectedDate}
               setSelectedDate={setSelectedDate}
             />
+            <CustomizeColumnsButton
+              columns={columns}
+              onColumnsChange={setColumns}
+            />
           </div>
 
-          <ContractsTable contracts={filteredContracts} />
+          <EnhancedContractsTable
+            contracts={filteredContracts}
+            visibleColumns={columns}
+          />
         </div>
       </main>
     </div>
