@@ -3,23 +3,16 @@ import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { Download, Eye, ChevronRight, ChevronDown } from "lucide-react";
 import { Link } from "react-router-dom";
 import { format } from "date-fns";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { type ColumnDefinition } from "./CustomizeColumnsButton";
 import { useState } from "react";
+import { TableCellWithTooltip } from "./TableCellWithTooltip";
+import { ResizableHeader } from "./ResizableHeader";
 
 interface Contract {
   id: number;
@@ -89,111 +82,114 @@ export function EnhancedContractsTable({
       }
     })();
 
-    return content ? (
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <div className="truncate max-w-[200px]">{content}</div>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>{content}</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-    ) : (
-      "-"
-    );
+    return content || "-";
   };
 
   return (
     <div className="border rounded-lg">
-      <ScrollArea className="w-full" type="always">
+      <ScrollArea className="w-full overflow-x-auto" type="always">
         <div className="min-w-[800px]">
           <Table>
-            <TableHeader>
+            <thead className="bg-background">
               <TableRow>
-                <TableHead className="w-[40px]" />
+                <ResizableHeader fixed className="w-[40px]">
+                  Actions
+                </ResizableHeader>
                 {visibleColumns
                   .filter((col) => col.visible)
-                  .map((column) => (
-                    <TableHead key={column.id} className="min-w-[150px]">
+                  .map((column, index) => (
+                    <ResizableHeader 
+                      key={column.id}
+                      fixed={index < 2} // First two columns are fixed
+                    >
                       {column.label}
-                    </TableHead>
+                    </ResizableHeader>
                   ))}
-                <TableHead className="w-[100px] text-right">Actions</TableHead>
+                <ResizableHeader className="w-[100px] text-right">
+                  Actions
+                </ResizableHeader>
               </TableRow>
-            </TableHeader>
+            </thead>
             <TableBody>
               {contracts.length === 0 ? (
                 <TableRow>
-                  <TableCell
-                    colSpan={visibleColumns.length + 2}
+                  <TableCellWithTooltip
+                    content="No contracts found. Try adjusting your filters."
                     className="text-center py-8 text-muted-foreground"
-                  >
-                    No contracts found. Try adjusting your filters.
-                  </TableCell>
+                    colSpan={visibleColumns.length + 2}
+                  />
                 </TableRow>
               ) : (
                 contracts.map((contract) => (
                   <>
                     <TableRow key={contract.id}>
-                      <TableCell>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6"
-                          onClick={() => toggleRow(contract.id)}
-                        >
-                          {expandedRows.includes(contract.id) ? (
-                            <ChevronDown className="h-4 w-4" />
-                          ) : (
-                            <ChevronRight className="h-4 w-4" />
-                          )}
-                        </Button>
-                      </TableCell>
+                      <TableCellWithTooltip
+                        fixed
+                        content={
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6"
+                            onClick={() => toggleRow(contract.id)}
+                          >
+                            {expandedRows.includes(contract.id) ? (
+                              <ChevronDown className="h-4 w-4" />
+                            ) : (
+                              <ChevronRight className="h-4 w-4" />
+                            )}
+                          </Button>
+                        }
+                      />
                       {visibleColumns
                         .filter((col) => col.visible)
-                        .map((column) => (
-                          <TableCell key={column.id}>
-                            {renderCellContent(contract, column.id)}
-                          </TableCell>
+                        .map((column, index) => (
+                          <TableCellWithTooltip
+                            key={column.id}
+                            fixed={index < 2}
+                            content={renderCellContent(contract, column.id)}
+                          />
                         ))}
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <Button variant="outline" size="icon" asChild>
-                            <Link to={`/contracts/${contract.id}`}>
-                              <Eye className="h-4 w-4" />
-                            </Link>
-                          </Button>
-                          <Button variant="outline" size="icon">
-                            <Download className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
+                      <TableCellWithTooltip
+                        content={
+                          <div className="flex justify-end gap-2">
+                            <Button variant="outline" size="icon" asChild>
+                              <Link to={`/contracts/${contract.id}`}>
+                                <Eye className="h-4 w-4" />
+                              </Link>
+                            </Button>
+                            <Button variant="outline" size="icon">
+                              <Download className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        }
+                      />
                     </TableRow>
                     {expandedRows.includes(contract.id) && (
                       <TableRow>
-                        <TableCell colSpan={visibleColumns.length + 2}>
-                          <div className="p-4 bg-muted/50">
-                            <h4 className="font-medium mb-2">Additional Details</h4>
-                            <dl className="grid grid-cols-2 gap-4">
-                              {Object.entries(contract)
-                                .filter(([key]) => !["id"].includes(key))
-                                .map(([key, value]) => (
-                                  <div key={key}>
-                                    <dt className="text-sm font-medium text-muted-foreground capitalize">
-                                      {key}
-                                    </dt>
-                                    <dd className="text-sm">
-                                      {Array.isArray(value)
-                                        ? value.join(", ")
-                                        : String(value)}
-                                    </dd>
-                                  </div>
-                                ))}
-                            </dl>
-                          </div>
-                        </TableCell>
+                        <TableCellWithTooltip
+                          content={
+                            <div className="p-4 bg-muted/50">
+                              <h4 className="font-medium mb-2">Additional Details</h4>
+                              <dl className="grid grid-cols-2 gap-4">
+                                {Object.entries(contract)
+                                  .filter(([key]) => !["id"].includes(key))
+                                  .map(([key, value]) => (
+                                    <div key={key}>
+                                      <dt className="text-sm font-medium text-muted-foreground capitalize">
+                                        {key}
+                                      </dt>
+                                      <dd className="text-sm">
+                                        {Array.isArray(value)
+                                          ? value.join(", ")
+                                          : String(value)}
+                                      </dd>
+                                    </div>
+                                  ))}
+                              </dl>
+                            </div>
+                          }
+                          colSpan={visibleColumns.length + 2}
+                        />
                       </TableRow>
                     )}
                   </>
