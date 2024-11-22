@@ -23,6 +23,8 @@ import {
 } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 
 interface AdvancedSearchProps {
   selectedType: string;
@@ -31,6 +33,8 @@ interface AdvancedSearchProps {
   setSelectedStatus: (status: string) => void;
   selectedDate: Date | undefined;
   setSelectedDate: (date: Date | undefined) => void;
+  filterLogic: "AND" | "OR";
+  setFilterLogic: (logic: "AND" | "OR") => void;
 }
 
 export function AdvancedSearch({
@@ -40,6 +44,8 @@ export function AdvancedSearch({
   setSelectedStatus,
   selectedDate,
   setSelectedDate,
+  filterLogic,
+  setFilterLogic,
 }: AdvancedSearchProps) {
   return (
     <Sheet>
@@ -56,6 +62,24 @@ export function AdvancedSearch({
           </SheetDescription>
         </SheetHeader>
         <div className="space-y-4 py-4">
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Filter Logic</label>
+            <RadioGroup
+              value={filterLogic}
+              onValueChange={(value) => setFilterLogic(value as "AND" | "OR")}
+              className="flex gap-4"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="AND" id="and" />
+                <Label htmlFor="and">Match ALL filters (AND)</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="OR" id="or" />
+                <Label htmlFor="or">Match ANY filter (OR)</Label>
+              </div>
+            </RadioGroup>
+          </div>
+
           <div className="space-y-2">
             <label className="text-sm font-medium">Contract Type</label>
             <Select value={selectedType} onValueChange={setSelectedType}>

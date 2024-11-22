@@ -19,6 +19,7 @@ export default function Contracts() {
   const [selectedType, setSelectedType] = useState("all");
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [selectedDate, setSelectedDate] = useState<Date>();
+  const [filterLogic, setFilterLogic] = useState<"AND" | "OR">("AND");
   
   const [columns, setColumns] = useState<ColumnDefinition[]>([
     { id: "name", label: "Contract Name", visible: true },
@@ -70,7 +71,17 @@ export default function Contracts() {
     const matchesStatus = selectedStatus === "all" || contract.status.toLowerCase() === selectedStatus.toLowerCase();
     const matchesDate = !selectedDate || format(new Date(contract.dateUploaded), "yyyy-MM-dd") === format(selectedDate, "yyyy-MM-dd");
     
-    return matchesSearch && matchesType && matchesStatus && matchesDate;
+    if (filterLogic === "AND") {
+      return matchesSearch && matchesType && matchesStatus && matchesDate;
+    } else {
+      // OR logic - show contract if it matches any of the filters
+      return (
+        matchesSearch ||
+        (selectedType !== "all" && matchesType) ||
+        (selectedStatus !== "all" && matchesStatus) ||
+        (selectedDate && matchesDate)
+      );
+    }
   });
 
   return (
@@ -107,6 +118,8 @@ export default function Contracts() {
               setSelectedStatus={setSelectedStatus}
               selectedDate={selectedDate}
               setSelectedDate={setSelectedDate}
+              filterLogic={filterLogic}
+              setFilterLogic={setFilterLogic}
             />
             <CustomizeColumnsButton
               columns={columns}
