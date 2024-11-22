@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { Download, Eye, ChevronRight, ChevronDown } from "lucide-react";
+import { Eye, ChevronRight, ChevronDown } from "lucide-react";
 import { Link } from "react-router-dom";
 import { type Contract } from "./types";
 import { type ColumnDefinition } from "./CustomizeColumnsButton";
@@ -21,8 +21,11 @@ export function ContractTableRow({
   renderCellContent,
 }: ContractTableRowProps) {
   return (
-    <TableRow>
-      <TableCell>
+    <TableRow 
+      className="cursor-pointer hover:bg-muted/50"
+      onClick={onToggleExpand}
+    >
+      <TableCell onClick={(e) => e.stopPropagation()}>
         <Button
           variant="ghost"
           size="icon"
@@ -43,15 +46,15 @@ export function ContractTableRow({
             {renderCellContent(contract, column.id)}
           </TableCell>
         ))}
-      <TableCell className="text-right sticky right-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <TableCell 
+        className="text-right sticky right-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex justify-end gap-2">
-          <Button variant="outline" size="icon" asChild>
+          <Button variant="outline" size="sm" asChild>
             <Link to={`/contracts/${contract.id}`}>
-              <Eye className="h-4 w-4" />
+              View Details
             </Link>
-          </Button>
-          <Button variant="outline" size="icon">
-            <Download className="h-4 w-4" />
           </Button>
         </div>
       </TableCell>

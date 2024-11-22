@@ -4,7 +4,7 @@ import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Download, ThumbsDown, ThumbsUp } from "lucide-react";
+import { ThumbsDown, ThumbsUp } from "lucide-react";
 import {
   Accordion,
   AccordionContent,
@@ -36,16 +36,19 @@ export default function ContractDetail() {
         id: "effective-date",
         title: "Effective Date",
         content: "March 1, 2024",
+        clauseRef: "Section 1.1",
       },
       {
         id: "governing-law",
         title: "Governing Law",
         content: "This agreement shall be governed by the laws of the State of California.",
+        clauseRef: "Section 12.3",
       },
       {
         id: "confidentiality",
         title: "Confidentiality",
         content: "All information shared between parties shall be kept strictly confidential.",
+        clauseRef: "Section 8.1",
       },
     ],
   };
@@ -94,10 +97,6 @@ export default function ContractDetail() {
 
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold tracking-tight">{contract.name}</h1>
-          <Button variant="outline">
-            <Download className="mr-2 h-4 w-4" />
-            Download Original Document
-          </Button>
         </div>
 
         <div className="space-y-6">
@@ -106,12 +105,31 @@ export default function ContractDetail() {
           <Accordion type="single" collapsible className="w-full">
             {contract.terms.map((term) => (
               <AccordionItem key={term.id} value={term.id}>
-                <AccordionTrigger>{term.title}</AccordionTrigger>
+                <AccordionTrigger>
+                  <div className="flex items-center gap-4">
+                    <span>{term.title}</span>
+                    <span className="text-sm text-muted-foreground">
+                      ({term.clauseRef})
+                    </span>
+                  </div>
+                </AccordionTrigger>
                 <AccordionContent>
                   <div className="space-y-4">
-                    <p>{term.content}</p>
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium text-muted-foreground">
+                        Clause Reference
+                      </p>
+                      <p className="text-sm">{term.clauseRef}</p>
+                    </div>
                     
-                    <div className="space-y-4">
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium text-muted-foreground">
+                        Content
+                      </p>
+                      <p>{term.content}</p>
+                    </div>
+                    
+                    <div className="space-y-4 pt-4 border-t">
                       <p className="text-sm text-muted-foreground">Is this information accurate?</p>
                       
                       <div className="flex gap-2">
