@@ -1,11 +1,4 @@
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetContent,
@@ -13,40 +6,47 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
+  SheetFooter,
 } from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
-import { SlidersHorizontal, Calendar as CalendarIcon } from "lucide-react";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { format } from "date-fns";
-import { cn } from "@/lib/utils";
+import { SlidersHorizontal, Plus } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import { FilterCondition as FilterConditionComponent } from "../filters/FilterCondition";
+import type { FilterCondition, FilterGroup } from "../filters/types";
 
 interface AdvancedSearchProps {
-  selectedType: string;
-  setSelectedType: (type: string) => void;
-  selectedStatus: string;
-  setSelectedStatus: (status: string) => void;
-  selectedDate: Date | undefined;
-  setSelectedDate: (date: Date | undefined) => void;
-  filterLogic: "AND" | "OR";
-  setFilterLogic: (logic: "AND" | "OR") => void;
+  filters: FilterGroup;
+  onFiltersChange: (filters: FilterGroup) => void;
 }
 
-export function AdvancedSearch({
-  selectedType,
-  setSelectedType,
-  selectedStatus,
-  setSelectedStatus,
-  selectedDate,
-  setSelectedDate,
-  filterLogic,
-  setFilterLogic,
-}: AdvancedSearchProps) {
+export function AdvancedSearch({ filters, onFiltersChange }: AdvancedSearchProps) {
+  const addCondition = () => {
+    onFiltersChange({
+      ...filters,
+      conditions: [
+        ...filters.conditions,
+        { field: 'name', operator: 'contains', value: '' },
+      ],
+    });
+  };
+
+  const updateCondition = (index: number, condition: FilterCondition) => {
+    const newConditions = [...filters.conditions];
+    newConditions[index] = condition;
+    onFiltersChange({ ...filters, conditions: newConditions });
+  };
+
+  const removeCondition = (index: number) => {
+    onFiltersChange({
+      ...filters,
+      conditions: filters.conditions.filter((_, i) => i !== index),
+    });
+  };
+
+  const clearFilters = () => {
+    onFiltersChange({ logic: 'AND', conditions: [] });
+  };
+
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -54,88 +54,64 @@ export function AdvancedSearch({
           <SlidersHorizontal className="h-4 w-4" />
         </Button>
       </SheetTrigger>
-      <SheetContent>
+      <SheetContent className="min-w-[400px]">
         <SheetHeader>
-          <SheetTitle>Advanced Search</SheetTitle>
+          <SheetTitle>Advanced Filters</SheetTitle>
           <SheetDescription>
-            Refine your search with additional filters
+            Build complex filter conditions to refine your search
           </SheetDescription>
         </SheetHeader>
-        <div className="space-y-4 py-4">
+
+        <div className="py-6 space-y-6">
           <div className="space-y-2">
-            <label className="text-sm font-medium">Filter Logic</label>
+            <Label>Combine conditions using</Label>
             <RadioGroup
-              value={filterLogic}
-              onValueChange={(value) => setFilterLogic(value as "AND" | "OR")}
+              value={filters.logic}
+              onValueChange={(value) => onFiltersChange({ ...filters, logic: value as 'AND' | 'OR' })}
               className="flex gap-4"
             >
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="AND" id="and" />
-                <Label htmlFor="and">Match ALL filters (AND)</Label>
+                <Label htmlFor="and">Match ALL conditions (AND)</Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="OR" id="or" />
-                <Label htmlFor="or">Match ANY filter (OR)</Label>
+                <Label htmlFor="or">Match ANY condition (OR)</Label>
               </div>
             </RadioGroup>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Contract Type</label>
-            <Select value={selectedType} onValueChange={setSelectedType}>
-              <SelectTrigger>
-                <SelectValue placeholder="Filter by Type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
-                <SelectItem value="service-agreement">Service Agreement</SelectItem>
-                <SelectItem value="nda">NDA</SelectItem>
-                <SelectItem value="employment">Employment</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Status</label>
-            <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-              <SelectTrigger>
-                <SelectValue placeholder="Filter by Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="draft">Draft</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="space-y-4">
+            {filters.conditions.map((condition, index) => (
+              'field' in condition && (
+                <FilterConditionComponent
+                  key={index}
+                  condition={condition}
+                  onChange={(newCondition) => updateCondition(index, newCondition)}
+                  onRemove={() => removeCondition(index)}
+                />
+              )
+            ))}
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Upload Date</label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn(
-                    "w-full justify-start text-left font-normal",
-                    !selectedDate && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {selectedDate ? format(selectedDate, "PPP") : "Pick a date"}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={selectedDate}
-                  onSelect={setSelectedDate}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={addCondition}
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Add Condition
+          </Button>
         </div>
+
+        <SheetFooter className="flex-col sm:flex-row gap-2">
+          <Button variant="outline" onClick={clearFilters}>
+            Clear All
+          </Button>
+          <Button type="submit" onClick={() => {}}>
+            Apply Filters
+          </Button>
+        </SheetFooter>
       </SheetContent>
     </Sheet>
   );

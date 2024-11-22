@@ -13,13 +13,15 @@ import { SearchBar } from "@/components/contracts/search/SearchBar";
 import { AdvancedSearch } from "@/components/contracts/search/AdvancedSearch";
 import { EnhancedContractsTable } from "@/components/contracts/table/EnhancedContractsTable";
 import { CustomizeColumnsButton, type ColumnDefinition } from "@/components/contracts/table/CustomizeColumnsButton";
+import { ActiveFilters } from "@/components/contracts/filters/ActiveFilters";
+import type { FilterGroup } from "@/components/contracts/filters/types";
 
 export default function Contracts() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedType, setSelectedType] = useState("all");
-  const [selectedStatus, setSelectedStatus] = useState("all");
-  const [selectedDate, setSelectedDate] = useState<Date>();
-  const [filterLogic, setFilterLogic] = useState<"AND" | "OR">("AND");
+  const [filters, setFilters] = useState<FilterGroup>({
+    logic: 'AND',
+    conditions: [],
+  });
   
   const [columns, setColumns] = useState<ColumnDefinition[]>([
     { id: "name", label: "Contract Name", visible: true },
@@ -65,24 +67,47 @@ export default function Contracts() {
     },
   ];
 
-  const filteredContracts = contracts.filter((contract) => {
+  const applyFilters = (contract: any) => {
     const matchesSearch = contract.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesType = selectedType === "all" || contract.type.toLowerCase() === selectedType.replace("-", " ");
-    const matchesStatus = selectedStatus === "all" || contract.status.toLowerCase() === selectedStatus.toLowerCase();
-    const matchesDate = !selectedDate || format(new Date(contract.dateUploaded), "yyyy-MM-dd") === format(selectedDate, "yyyy-MM-dd");
     
-    if (filterLogic === "AND") {
-      return matchesSearch && matchesType && matchesStatus && matchesDate;
-    } else {
-      // OR logic - show contract if it matches any of the filters
-      return (
-        matchesSearch ||
-        (selectedType !== "all" && matchesType) ||
-        (selectedStatus !== "all" && matchesStatus) ||
-        (selectedDate && matchesDate)
-      );
-    }
-  });
+    if (filters.conditions.length === 0) return matchesSearch;
+
+    const matchesFilters = filters.conditions.map(condition => {
+      if (!('field' in condition)) return true;
+      
+      const value = contract[condition.field];
+      switch (condition.operator) {
+        case 'equals':
+          return String(value).toLowerCase() === String(condition.value).toLowerCase();
+        case 'contains':
+          return String(value).toLowerCase().includes(String(condition.value).toLowerCase());
+        case 'greaterThan':
+          return Number(value) > Number(condition.value);
+        case 'lessThan':
+          return Number(value) < Number(condition.value);
+        default:
+          return true;
+      }
+    });
+
+    return filters.logic === 'AND'
+      ? matchesSearch && matchesFilters.every(Boolean)
+      : matchesSearch || matchesFilters.some(Boolean);
+  };
+
+  const filteredContracts = contracts.filter(applyFilters);
+
+  const handleRemoveCondition = (index: number) => {
+    setFilters({
+      ...filters,
+      conditions: filters.conditions.filter((_, i) => i !== index),
+    });
+  };
+
+  const handleClearFilters = () => {
+    setFilters({ logic: 'AND', conditions: [] });
+    setSearchQuery("");
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -112,20 +137,20 @@ export default function Contracts() {
           <div className="flex gap-4 items-center">
             <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
             <AdvancedSearch
-              selectedType={selectedType}
-              setSelectedType={setSelectedType}
-              selectedStatus={selectedStatus}
-              setSelectedStatus={setSelectedStatus}
-              selectedDate={selectedDate}
-              setSelectedDate={setSelectedDate}
-              filterLogic={filterLogic}
-              setFilterLogic={setFilterLogic}
+              filters={filters}
+              onFiltersChange={setFilters}
             />
             <CustomizeColumnsButton
               columns={columns}
               onColumnsChange={setColumns}
             />
           </div>
+
+          <ActiveFilters
+            filters={filters}
+            onRemoveCondition={handleRemoveCondition}
+            onClearAll={handleClearFilters}
+          />
 
           <EnhancedContractsTable
             contracts={filteredContracts}
