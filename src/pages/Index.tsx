@@ -117,33 +117,37 @@ export default function Index() {
           <h2 className="text-2xl font-semibold tracking-tight">Recent Activity</h2>
           <div className="grid gap-4">
             {recentContracts.map((contract) => (
-              <Card key={contract.id} className="p-6 hover:bg-accent transition-colors">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    <FileText className="h-6 w-6 text-muted-foreground" />
-                    <div>
-                      <h3 className="font-medium">{contract.name}</h3>
-                      <p className="text-sm text-muted-foreground">
-                        {contract.date}
-                      </p>
+              <Link 
+                key={contract.id} 
+                to={contract.status === "Uploaded" ? `/contracts/${contract.id}` : "#"}
+                className={contract.status === "Uploaded" ? "cursor-pointer" : "cursor-default"}
+              >
+                <Card className="p-6 hover:bg-accent transition-colors">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-4">
+                      <FileText className="h-6 w-6 text-muted-foreground" />
+                      <div>
+                        <h3 className="font-medium">{contract.name}</h3>
+                        <p className="text-sm text-muted-foreground">
+                          {contract.date}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <span className={`px-3 py-1 rounded-full text-sm ${
+                        contract.status === "Processing"
+                          ? "bg-blue-100 text-blue-700"
+                          : "bg-green-100 text-green-700"
+                      }`}>
+                        {contract.status}
+                      </span>
+                      {contract.status === "Uploaded" && (
+                        <Eye className="h-5 w-5 text-muted-foreground hover:text-foreground transition-colors" />
+                      )}
                     </div>
                   </div>
-                  <div className="flex items-center gap-4">
-                    <span className={`px-3 py-1 rounded-full text-sm ${
-                      contract.status === "Processing"
-                        ? "bg-blue-100 text-blue-700"
-                        : "bg-green-100 text-green-700"
-                    }`}>
-                      {contract.status}
-                    </span>
-                    {contract.status === "Uploaded" && (
-                      <Link to={`/contracts/${contract.id}`}>
-                        <Eye className="h-5 w-5 text-muted-foreground hover:text-foreground transition-colors" />
-                      </Link>
-                    )}
-                  </div>
-                </div>
-              </Card>
+                </Card>
+              </Link>
             ))}
           </div>
         </div>

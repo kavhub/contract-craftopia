@@ -108,23 +108,13 @@ export default function ContractDetail() {
                 <AccordionTrigger>
                   <div className="flex items-center gap-4">
                     <span>{term.title}</span>
-                    <span className="text-sm text-muted-foreground">
-                      ({term.clauseRef})
-                    </span>
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
                   <div className="space-y-4">
                     <div className="space-y-2">
                       <p className="text-sm font-medium text-muted-foreground">
-                        Clause Reference
-                      </p>
-                      <p className="text-sm">{term.clauseRef}</p>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <p className="text-sm font-medium text-muted-foreground">
-                        Content
+                        Clause Reference: {term.clauseRef}
                       </p>
                       <p>{term.content}</p>
                     </div>
