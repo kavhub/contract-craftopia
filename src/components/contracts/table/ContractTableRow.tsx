@@ -2,12 +2,6 @@ import { Button } from "@/components/ui/button";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Download, Eye, ChevronRight, ChevronDown } from "lucide-react";
 import { Link } from "react-router-dom";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { type Contract } from "./types";
 import { type ColumnDefinition } from "./CustomizeColumnsButton";
 

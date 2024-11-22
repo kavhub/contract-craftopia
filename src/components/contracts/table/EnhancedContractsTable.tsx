@@ -123,9 +123,8 @@ export function EnhancedContractsTable({
                 </TableRow>
               ) : (
                 contracts.map((contract) => (
-                  <>
+                  <React.Fragment key={contract.id}>
                     <ContractTableRow
-                      key={contract.id}
                       contract={contract}
                       visibleColumns={visibleColumns}
                       isExpanded={expandedRows.includes(contract.id)}
@@ -157,7 +156,7 @@ export function EnhancedContractsTable({
                         </TableCell>
                       </TableRow>
                     )}
-                  </>
+                  </React.Fragment>
                 ))
               )}
             </TableBody>
