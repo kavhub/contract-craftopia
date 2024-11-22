@@ -1,5 +1,4 @@
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -14,25 +13,12 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Download, Eye, ChevronRight, ChevronDown } from "lucide-react";
-import { Link } from "react-router-dom";
 import { format } from "date-fns";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { type ColumnDefinition } from "./CustomizeColumnsButton";
 import { useState } from "react";
-
-interface Contract {
-  id: number;
-  name: string;
-  type: string;
-  dateUploaded: string;
-  status: string;
-  currency?: string;
-  value?: number;
-  parties?: string[];
-  restrictions?: string;
-  terms?: Record<string, string>;
-}
+import { ContractTableRow } from "./ContractTableRow";
+import type { Contract } from "./types";
 
 interface EnhancedContractsTableProps {
   contracts: Contract[];
@@ -46,9 +32,9 @@ export function EnhancedContractsTable({
   const [expandedRows, setExpandedRows] = useState<number[]>([]);
 
   const toggleRow = (contractId: number) => {
-    setExpandedRows(prev =>
+    setExpandedRows((prev) =>
       prev.includes(contractId)
-        ? prev.filter(id => id !== contractId)
+        ? prev.filter((id) => id !== contractId)
         : [...prev, contractId]
     );
   };
@@ -106,9 +92,9 @@ export function EnhancedContractsTable({
   };
 
   return (
-    <div className="border rounded-lg">
-      <ScrollArea className="w-full" type="always">
-        <div className="min-w-[800px]">
+    <div className="relative border rounded-lg">
+      <ScrollArea className="w-full overflow-auto" type="always">
+        <div className="min-w-[1000px]">
           <Table>
             <TableHeader>
               <TableRow>
@@ -120,7 +106,9 @@ export function EnhancedContractsTable({
                       {column.label}
                     </TableHead>
                   ))}
-                <TableHead className="w-[100px] text-right">Actions</TableHead>
+                <TableHead className="w-[100px] text-right sticky right-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+                  Actions
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -136,41 +124,14 @@ export function EnhancedContractsTable({
               ) : (
                 contracts.map((contract) => (
                   <>
-                    <TableRow key={contract.id}>
-                      <TableCell>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6"
-                          onClick={() => toggleRow(contract.id)}
-                        >
-                          {expandedRows.includes(contract.id) ? (
-                            <ChevronDown className="h-4 w-4" />
-                          ) : (
-                            <ChevronRight className="h-4 w-4" />
-                          )}
-                        </Button>
-                      </TableCell>
-                      {visibleColumns
-                        .filter((col) => col.visible)
-                        .map((column) => (
-                          <TableCell key={column.id}>
-                            {renderCellContent(contract, column.id)}
-                          </TableCell>
-                        ))}
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <Button variant="outline" size="icon" asChild>
-                            <Link to={`/contracts/${contract.id}`}>
-                              <Eye className="h-4 w-4" />
-                            </Link>
-                          </Button>
-                          <Button variant="outline" size="icon">
-                            <Download className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
+                    <ContractTableRow
+                      key={contract.id}
+                      contract={contract}
+                      visibleColumns={visibleColumns}
+                      isExpanded={expandedRows.includes(contract.id)}
+                      onToggleExpand={() => toggleRow(contract.id)}
+                      renderCellContent={renderCellContent}
+                    />
                     {expandedRows.includes(contract.id) && (
                       <TableRow>
                         <TableCell colSpan={visibleColumns.length + 2}>
