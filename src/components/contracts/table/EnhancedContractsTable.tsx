@@ -14,11 +14,12 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Download, Eye, ChevronRight } from "lucide-react";
+import { Download, Eye, ChevronRight, ChevronDown } from "lucide-react";
 import { Link } from "react-router-dom";
 import { format } from "date-fns";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { type ColumnDefinition } from "./CustomizeColumnsButton";
+import { useState } from "react";
 
 interface Contract {
   id: number;
@@ -42,6 +43,16 @@ export function EnhancedContractsTable({
   contracts,
   visibleColumns,
 }: EnhancedContractsTableProps) {
+  const [expandedRows, setExpandedRows] = useState<number[]>([]);
+
+  const toggleRow = (contractId: number) => {
+    setExpandedRows(prev =>
+      prev.includes(contractId)
+        ? prev.filter(id => id !== contractId)
+        : [...prev, contractId]
+    );
+  };
+
   const renderCellContent = (contract: Contract, columnId: string) => {
     const content = (() => {
       switch (columnId) {
@@ -124,32 +135,68 @@ export function EnhancedContractsTable({
                 </TableRow>
               ) : (
                 contracts.map((contract) => (
-                  <TableRow key={contract.id}>
-                    <TableCell>
-                      <Button variant="ghost" size="icon" className="h-6 w-6">
-                        <ChevronRight className="h-4 w-4" />
-                      </Button>
-                    </TableCell>
-                    {visibleColumns
-                      .filter((col) => col.visible)
-                      .map((column) => (
-                        <TableCell key={column.id}>
-                          {renderCellContent(contract, column.id)}
+                  <>
+                    <TableRow key={contract.id}>
+                      <TableCell>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6"
+                          onClick={() => toggleRow(contract.id)}
+                        >
+                          {expandedRows.includes(contract.id) ? (
+                            <ChevronDown className="h-4 w-4" />
+                          ) : (
+                            <ChevronRight className="h-4 w-4" />
+                          )}
+                        </Button>
+                      </TableCell>
+                      {visibleColumns
+                        .filter((col) => col.visible)
+                        .map((column) => (
+                          <TableCell key={column.id}>
+                            {renderCellContent(contract, column.id)}
+                          </TableCell>
+                        ))}
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button variant="outline" size="icon" asChild>
+                            <Link to={`/contracts/${contract.id}`}>
+                              <Eye className="h-4 w-4" />
+                            </Link>
+                          </Button>
+                          <Button variant="outline" size="icon">
+                            <Download className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                    {expandedRows.includes(contract.id) && (
+                      <TableRow>
+                        <TableCell colSpan={visibleColumns.length + 2}>
+                          <div className="p-4 bg-muted/50">
+                            <h4 className="font-medium mb-2">Additional Details</h4>
+                            <dl className="grid grid-cols-2 gap-4">
+                              {Object.entries(contract)
+                                .filter(([key]) => !["id"].includes(key))
+                                .map(([key, value]) => (
+                                  <div key={key}>
+                                    <dt className="text-sm font-medium text-muted-foreground capitalize">
+                                      {key}
+                                    </dt>
+                                    <dd className="text-sm">
+                                      {Array.isArray(value)
+                                        ? value.join(", ")
+                                        : String(value)}
+                                    </dd>
+                                  </div>
+                                ))}
+                            </dl>
+                          </div>
                         </TableCell>
-                      ))}
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button variant="outline" size="icon" asChild>
-                          <Link to={`/contracts/${contract.id}`}>
-                            <Eye className="h-4 w-4" />
-                          </Link>
-                        </Button>
-                        <Button variant="outline" size="icon">
-                          <Download className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
+                      </TableRow>
+                    )}
+                  </>
                 ))
               )}
             </TableBody>
