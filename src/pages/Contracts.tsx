@@ -67,11 +67,11 @@ export default function Contracts() {
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink as={Link} to="/">Dashboard</BreadcrumbLink>
+              <Link className="transition-colors hover:text-foreground" to="/">Dashboard</Link>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbLink>Contracts</BreadcrumbLink>
+              <span className="font-normal text-foreground">Contracts</span>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>

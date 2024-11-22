@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import {
   Breadcrumb,
   BreadcrumbItem,
-  BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
@@ -16,11 +15,11 @@ export default function Processing() {
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink as={Link} to="/">Dashboard</BreadcrumbLink>
+            <Link className="transition-colors hover:text-foreground" to="/">Dashboard</Link>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbLink>Processing Contract</BreadcrumbLink>
+            <span className="font-normal text-foreground">Processing Contract</span>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>

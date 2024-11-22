@@ -79,15 +79,15 @@ export default function ContractDetail() {
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink as={Link} to="/">Dashboard</BreadcrumbLink>
+              <Link className="transition-colors hover:text-foreground" to="/">Dashboard</Link>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbLink as={Link} to="/contracts">Contracts</BreadcrumbLink>
+              <Link className="transition-colors hover:text-foreground" to="/contracts">Contracts</Link>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbLink>{contract.name}</BreadcrumbLink>
+              <span className="font-normal text-foreground">{contract.name}</span>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
