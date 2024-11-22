@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
@@ -16,7 +17,6 @@ import {
 import { format } from "date-fns";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { type ColumnDefinition } from "./CustomizeColumnsButton";
-import { useState } from "react";
 import { ContractTableRow } from "./ContractTableRow";
 import type { Contract } from "./types";
 
