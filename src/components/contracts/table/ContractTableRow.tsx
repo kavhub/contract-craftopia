@@ -69,13 +69,29 @@ export function ContractTableRow({
                 <div>
                   <h4 className="font-medium mb-2">Contract Details</h4>
                   <dl className="space-y-2">
-                    {contract.parties && (
+                    <div>
+                      <dt className="text-sm font-medium text-muted-foreground">Contract Name</dt>
+                      <dd>{contract.name}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-sm font-medium text-muted-foreground">Type</dt>
+                      <dd>{contract.type}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-sm font-medium text-muted-foreground">Date Uploaded</dt>
+                      <dd>{format(new Date(contract.dateUploaded), "MMM d, yyyy")}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-sm font-medium text-muted-foreground">Status</dt>
+                      <dd>{contract.status}</dd>
+                    </div>
+                    {contract.parties && contract.parties.length > 0 && (
                       <div>
                         <dt className="text-sm font-medium text-muted-foreground">Parties</dt>
                         <dd>{contract.parties.join(", ")}</dd>
                       </div>
                     )}
-                    {contract.value && (
+                    {contract.value !== undefined && (
                       <div>
                         <dt className="text-sm font-medium text-muted-foreground">Value</dt>
                         <dd>{contract.currency} {contract.value.toLocaleString()}</dd>
