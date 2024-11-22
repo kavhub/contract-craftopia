@@ -11,9 +11,15 @@ interface TableCellWithTooltipProps {
   content: React.ReactNode;
   className?: string;
   fixed?: boolean;
+  colSpan?: number;  // Add colSpan prop
 }
 
-export function TableCellWithTooltip({ content, className, fixed }: TableCellWithTooltipProps) {
+export function TableCellWithTooltip({ 
+  content, 
+  className, 
+  fixed, 
+  colSpan  // Include colSpan in destructuring
+}: TableCellWithTooltipProps) {
   const isString = typeof content === 'string';
   const shouldTruncate = isString && content.length > 50;
 
@@ -24,6 +30,7 @@ export function TableCellWithTooltip({ content, className, fixed }: TableCellWit
         fixed && "sticky left-0 bg-background z-10",
         className
       )}
+      colSpan={colSpan}  // Pass colSpan to TableCell
     >
       {shouldTruncate ? (
         <TooltipProvider>
