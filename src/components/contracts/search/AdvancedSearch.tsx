@@ -54,7 +54,7 @@ export function AdvancedSearch({ filters, onFiltersChange }: AdvancedSearchProps
           <SlidersHorizontal className="h-4 w-4" />
         </Button>
       </SheetTrigger>
-      <SheetContent className="min-w-[400px]">
+      <SheetContent className="min-w-[440px]">
         <SheetHeader>
           <SheetTitle>Advanced Filters</SheetTitle>
           <SheetDescription>
