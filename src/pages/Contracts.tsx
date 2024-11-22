@@ -27,7 +27,7 @@ export default function Contracts() {
     { id: "status", label: "Status", visible: true },
     { id: "currency", label: "Currency", visible: true },
     { id: "value", label: "Value", visible: true },
-    { id: "parties", label: "Parties", visible: true },
+    { id: "parties", label: "Parties", visible: false },
     { id: "restrictions", label: "Restrictions", visible: false },
   ]);
 
