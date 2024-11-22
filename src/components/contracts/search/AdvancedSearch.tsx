@@ -9,10 +9,9 @@ import {
   SheetFooter,
 } from "@/components/ui/sheet";
 import { SlidersHorizontal, Plus } from "lucide-react";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
 import { FilterCondition as FilterConditionComponent } from "../filters/FilterCondition";
 import type { FilterCondition, FilterGroup } from "../filters/types";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface AdvancedSearchProps {
   filters: FilterGroup;
@@ -25,7 +24,7 @@ export function AdvancedSearch({ filters, onFiltersChange }: AdvancedSearchProps
       ...filters,
       conditions: [
         ...filters.conditions,
-        { field: 'name', operator: 'contains', value: '' },
+        { field: 'name', operator: 'contains', value: '', logic: 'AND' },
       ],
     });
   };
@@ -33,6 +32,14 @@ export function AdvancedSearch({ filters, onFiltersChange }: AdvancedSearchProps
   const updateCondition = (index: number, condition: FilterCondition) => {
     const newConditions = [...filters.conditions];
     newConditions[index] = condition;
+    onFiltersChange({ ...filters, conditions: newConditions });
+  };
+
+  const updateLogic = (index: number, logic: 'AND' | 'OR') => {
+    const newConditions = [...filters.conditions];
+    if ('field' in newConditions[index]) {
+      newConditions[index] = { ...newConditions[index], logic };
+    }
     onFiltersChange({ ...filters, conditions: newConditions });
   };
 
@@ -63,33 +70,30 @@ export function AdvancedSearch({ filters, onFiltersChange }: AdvancedSearchProps
         </SheetHeader>
 
         <div className="py-6 space-y-6">
-          <div className="space-y-2">
-            <Label>Combine conditions using</Label>
-            <RadioGroup
-              value={filters.logic}
-              onValueChange={(value) => onFiltersChange({ ...filters, logic: value as 'AND' | 'OR' })}
-              className="flex gap-4"
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="AND" id="and" />
-                <Label htmlFor="and">Match ALL conditions (AND)</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="OR" id="or" />
-                <Label htmlFor="or">Match ANY condition (OR)</Label>
-              </div>
-            </RadioGroup>
-          </div>
-
           <div className="space-y-4">
             {filters.conditions.map((condition, index) => (
               'field' in condition && (
-                <FilterConditionComponent
-                  key={index}
-                  condition={condition}
-                  onChange={(newCondition) => updateCondition(index, newCondition)}
-                  onRemove={() => removeCondition(index)}
-                />
+                <div key={index} className="space-y-2">
+                  {index > 0 && (
+                    <Select
+                      value={condition.logic || 'AND'}
+                      onValueChange={(value) => updateLogic(index, value as 'AND' | 'OR')}
+                    >
+                      <SelectTrigger className="w-[100px]">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="AND">AND</SelectItem>
+                        <SelectItem value="OR">OR</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                  <FilterConditionComponent
+                    condition={condition}
+                    onChange={(newCondition) => updateCondition(index, newCondition)}
+                    onRemove={() => removeCondition(index)}
+                  />
+                </div>
               )
             ))}
           </div>

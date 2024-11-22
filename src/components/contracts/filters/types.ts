@@ -4,6 +4,7 @@ export interface FilterCondition {
   field: string;
   operator: FilterOperator;
   value: string | number | string[];
+  logic?: 'AND' | 'OR';
 }
 
 export interface FilterGroup {
