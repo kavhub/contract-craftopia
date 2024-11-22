@@ -4,8 +4,6 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
-  TableHeader,
   TableRow,
 } from "@/components/ui/table";
 import {
@@ -17,11 +15,13 @@ import {
 import { format } from "date-fns";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown, Download } from "lucide-react";
+import { Download } from "lucide-react";
 import { type ColumnDefinition } from "./CustomizeColumnsButton";
 import { ContractTableRow } from "./ContractTableRow";
 import type { Contract } from "./types";
 import * as XLSX from 'xlsx';
+import { TableHeader } from "./TableHeader";
+import { useToast } from "@/hooks/use-toast";
 
 interface EnhancedContractsTableProps {
   contracts: Contract[];
@@ -39,6 +39,7 @@ export function EnhancedContractsTable({
 }: EnhancedContractsTableProps) {
   const [expandedRows, setExpandedRows] = useState<number[]>([]);
   const [sortConfig, setSortConfig] = useState<SortConfig>(null);
+  const { toast } = useToast();
 
   const toggleRow = (contractId: number) => {
     setExpandedRows((prev) =>
@@ -77,7 +78,7 @@ export function EnhancedContractsTable({
     const exportData = sortedContracts.map(contract => {
       const row: Record<string, any> = {};
       visibleColumns
-        .filter(col => col.visible)
+        .filter(col => col.visible && col.id !== 'status')
         .forEach(col => {
           if (col.id === 'dateUploaded') {
             row[col.label] = format(new Date(contract[col.id]), "MMM d, yyyy");
@@ -92,9 +93,16 @@ export function EnhancedContractsTable({
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Contracts");
     XLSX.writeFile(wb, "contracts.xlsx");
+    
+    toast({
+      title: "Export successful",
+      description: "Your data has been exported to Excel.",
+    });
   };
 
   const renderCellContent = (contract: Contract, columnId: string) => {
+    if (columnId === 'status') return null;
+    
     const content = (() => {
       switch (columnId) {
         case "name":
@@ -103,20 +111,6 @@ export function EnhancedContractsTable({
           return contract.type;
         case "dateUploaded":
           return format(new Date(contract.dateUploaded), "MMM d, yyyy");
-        case "status":
-          return (
-            <Badge
-              variant={
-                contract.status === "Active"
-                  ? "default"
-                  : contract.status === "Pending"
-                  ? "secondary"
-                  : "outline"
-              }
-            >
-              {contract.status}
-            </Badge>
-          );
         case "currency":
           return contract.currency;
         case "value":
@@ -157,32 +151,11 @@ export function EnhancedContractsTable({
       <ScrollArea className="w-full overflow-auto" type="always">
         <div className="min-w-[1000px]">
           <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[40px]" />
-                {visibleColumns
-                  .filter((col) => col.visible)
-                  .map((column) => (
-                    <TableHead
-                      key={column.id}
-                      className="min-w-[150px] cursor-pointer"
-                      onClick={() => handleSort(column.id)}
-                    >
-                      <div className="flex items-center gap-2">
-                        {column.label}
-                        <ArrowUpDown className={`h-4 w-4 ${
-                          sortConfig?.key === column.id
-                            ? 'text-foreground'
-                            : 'text-muted-foreground'
-                        }`} />
-                      </div>
-                    </TableHead>
-                  ))}
-                <TableHead className="w-[100px] text-right sticky right-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-                  Actions
-                </TableHead>
-              </TableRow>
-            </TableHeader>
+            <TableHeader 
+              visibleColumns={visibleColumns} 
+              onSort={handleSort} 
+              sortConfig={sortConfig}
+            />
             <TableBody>
               {sortedContracts.length === 0 ? (
                 <TableRow>
@@ -195,40 +168,14 @@ export function EnhancedContractsTable({
                 </TableRow>
               ) : (
                 sortedContracts.map((contract) => (
-                  <React.Fragment key={contract.id}>
-                    <ContractTableRow
-                      contract={contract}
-                      visibleColumns={visibleColumns}
-                      isExpanded={expandedRows.includes(contract.id)}
-                      onToggleExpand={() => toggleRow(contract.id)}
-                      renderCellContent={renderCellContent}
-                    />
-                    {expandedRows.includes(contract.id) && (
-                      <TableRow>
-                        <TableCell colSpan={visibleColumns.length + 2}>
-                          <div className="p-4 bg-muted/50">
-                            <h4 className="font-medium mb-2">Additional Details</h4>
-                            <dl className="grid grid-cols-2 gap-4">
-                              {Object.entries(contract)
-                                .filter(([key]) => !["id"].includes(key))
-                                .map(([key, value]) => (
-                                  <div key={key}>
-                                    <dt className="text-sm font-medium text-muted-foreground capitalize">
-                                      {key}
-                                    </dt>
-                                    <dd className="text-sm">
-                                      {Array.isArray(value)
-                                        ? value.join(", ")
-                                        : String(value)}
-                                    </dd>
-                                  </div>
-                                ))}
-                            </dl>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </React.Fragment>
+                  <ContractTableRow
+                    key={contract.id}
+                    contract={contract}
+                    visibleColumns={visibleColumns.filter(col => col.id !== 'status')}
+                    isExpanded={expandedRows.includes(contract.id)}
+                    onToggleExpand={() => toggleRow(contract.id)}
+                    renderCellContent={renderCellContent}
+                  />
                 ))
               )}
             </TableBody>
