@@ -5,13 +5,11 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogFooter,
 } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Columns } from "lucide-react";
 import { useState } from "react";
-import { useToast } from "@/hooks/use-toast";
 
 export type ColumnDefinition = {
   id: string;
@@ -29,8 +27,6 @@ export function CustomizeColumnsButton({
   onColumnsChange,
 }: CustomizeColumnsButtonProps) {
   const [localColumns, setLocalColumns] = useState(columns);
-  const [open, setOpen] = useState(false);
-  const { toast } = useToast();
 
   const handleColumnToggle = (columnId: string) => {
     const updatedColumns = localColumns.map((col) =>
@@ -41,15 +37,10 @@ export function CustomizeColumnsButton({
 
   const handleApply = () => {
     onColumnsChange(localColumns);
-    setOpen(false);
-    toast({
-      title: "Columns updated",
-      description: "Your column preferences have been saved.",
-    });
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog>
       <DialogTrigger asChild>
         <Button variant="outline" size="sm" className="ml-2">
           <Columns className="h-4 w-4 mr-2" />
@@ -58,34 +49,30 @@ export function CustomizeColumnsButton({
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle className="text-xl font-semibold">Customize Columns</DialogTitle>
+          <DialogTitle>Customize Columns</DialogTitle>
         </DialogHeader>
-        <div className="py-4">
-          <ScrollArea className="h-[300px] pr-4">
-            <div className="space-y-4">
-              {localColumns
-                .filter(col => col.id !== 'status')
-                .map((column) => (
-                  <div key={column.id} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={column.id}
-                      checked={column.visible}
-                      onCheckedChange={() => handleColumnToggle(column.id)}
-                    />
-                    <label
-                      htmlFor={column.id}
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                    >
-                      {column.label}
-                    </label>
-                  </div>
-                ))}
-            </div>
-          </ScrollArea>
+        <ScrollArea className="h-[300px] px-4">
+          <div className="space-y-4">
+            {localColumns.map((column) => (
+              <div key={column.id} className="flex items-center space-x-2">
+                <Checkbox
+                  id={column.id}
+                  checked={column.visible}
+                  onCheckedChange={() => handleColumnToggle(column.id)}
+                />
+                <label
+                  htmlFor={column.id}
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  {column.label}
+                </label>
+              </div>
+            ))}
+          </div>
+        </ScrollArea>
+        <div className="flex justify-end">
+          <Button onClick={handleApply}>Apply Changes</Button>
         </div>
-        <DialogFooter>
-          <Button onClick={handleApply} className="w-full">Apply Changes</Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
